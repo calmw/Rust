@@ -1,0 +1,84 @@
+####                    
+
+- for循环在rust中时迭代的主力
+- 使用时候注意容器的生命周期，如下表格，第一种情况迭代后，生命周期结束，后面不可用；第二种后面可以继续用；第三种在迭代时可以修改元素，后面依旧可用
+
+| 简化形式                        | 等价于                                             | 访问级别  |
+|-----------------------------|-------------------------------------------------|-------|
+| for item in collection      | for item in IntoIterator::into_iter(collection) | 拥有所有权 |
+| for item in &collection     | for item in collection.iter()                   | 只读    |
+| for item in &mut collection | for item in collection.iter_mut()               | 读写    |
+
+#### 匿名循环
+
+- 如果此局部变量在本块中并不会用到，可以使用_来代替此变量。代码如下：
+
+``` rust
+fn main() {
+    for _ in 0..10 {}
+}
+```
+
+#### 尽量避免手动管理索引变量
+
+- 这在rust中是合法的，但不建议使用这种模式，如下面代码：
+
+``` rust
+    let collection = [1, 2, 3, 4, 5];
+    for i in 0..collection.len() {
+        let item = collection[i];
+        // ...
+    }
+```
+
+- 这种手动模式存在两个问题：
+    1. 性能问题。在collection[index]语法中，这个索引值的语法会导致运行时的边界检查，带来了运行时开销
+    2. 安全性问题。随着时间的推移，周期性的访问collection会引入让其发生更改的可能性。若使用for循环直接遍历collection，rust会保证在整个迭代期间，collection不会被郑旭的其他部分影响。
+
+#### continue 跳过本次迭代
+
+#### break 立即退出循环
+
+#### while循环
+
+- while循环的例子：
+
+``` rust
+use std::time::{Duration, Instant}; // 将Duration, Instant从std::time中导入到当前作用域
+
+fn main() {
+    let mut count = 0;
+    let time_limit = Duration::new(1, 0); // 创建一个1s的时间间隔
+    let start = Instant::now(); // 访问系统时钟时间
+
+    while (Instant::now() - start) < time_limit {
+        count += 1;
+    }
+    println!("{}", count)
+}
+```
+
+- 避免使用while循环来实现无限循环，实现无限循环建议使用loop关键字
+
+#### loop 关键字
+
+- loop循环一次又一次的执行代码块，永远不会停下来，直到遇到break，或者外部terminate
+
+#### 标签
+
+- 跟go类似，break和continue后面加上循环标签，可以退出嵌套循环，或者跳到外层循环,看下面代码：
+
+``` rust
+fn main() {
+    'out: for i in 0.. {
+        for j in 0.. {
+            for k in 0.. {
+                if i + j + k > 1000 {
+                    println!("{}", i + j + k);
+                    break 'out;
+                }
+            }
+        }
+    }
+}
+```
