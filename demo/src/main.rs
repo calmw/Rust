@@ -1,8 +1,21 @@
-fn main() {
-    match item {
-        0 => {} // 匹配一个单值。这时是不需要任何运算的
-        10..=20 => {} // ..=语法匹配一个范围，包含范围（10..=20）
-        40 | 80 => {} // 竖线（｜）表示匹配其中任意一个值的情况
-        _ => {} // 下划线在这里表示匹配所有值
-    } // 如果match的各个分支没有覆盖到所有可能的情况，编译器会报错。一个分支被匹配到后，会立即返回，不会执行下一个分支
+use std::ops::{Add};
+// <1>
+use std::time::{Duration};                       // <2>
+
+fn add<T: Add<Output=T>>(i: T, j: T) -> T {    // <3>
+    i + j
 }
+
+fn main() {
+    let floats = add(1.2, 3.4);      // <4>
+    let ints = add(10, 20);          // <5>
+    let durations = add(             // <6>
+                                     Duration::new(5, 0),           // <6>
+                                     Duration::new(10, 0),           // <6>
+    );
+
+    println!("{}", floats);
+    println!("{}", ints);
+    println!("{:?}", durations);    // <7>
+}
+
