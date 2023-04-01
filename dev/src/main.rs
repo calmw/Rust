@@ -1,4 +1,9 @@
 #![allow(dead_code)]
+//! 表示当前语言项的文档，即编译器刚刚进入的哪个模块
+
+/// 用于注解其后紧跟着的语言项1
+/// 用于注解其后紧跟着的语言项2
+
 
 use std::fmt;
 use std::fmt::{Display};
@@ -19,7 +24,11 @@ pub struct File {
 }
 
 impl File {
-    // 虽然File结构体是公有的，但其方法也必须显式的标记为共有的
+    /// New files are assumed to be empty
+    /// ## new 方法注释
+    /// ```
+    /// let f = File::new("f1.txt")
+    /// ```
     pub fn new(name: &str) -> File {
         File {
             name: String::from(name),
