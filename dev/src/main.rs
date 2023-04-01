@@ -1,49 +1,19 @@
-use std::fs::File;
-// BufReader负责提供I/O（buffered I/O），这样可以减少对操作系统的调用，也就是说减少对硬盘的读取次数。
-use std::io;
-use std::io::BufReader;
-use std::io::prelude::*;
-use regex::Regex;
-use clap::{App, Arg};
+#![allow(unused_variables)] // 在构思过程中放宽编译器警告
 
 fn main() {
-    let args = App::new("grep=lite") // 逐行构建命令行参数解析器。每个参数对应一个Arg。
-        .version("0.1")
-        .about("searches for patterns")
-        .arg(Arg::with_name("pattern")
-            .help("The pattern to search for")
-            .takes_value(true)
-            .required(true)
-        )
-        .arg(Arg::with_name("input")
-            .help("File to search")
-            .takes_value(true)
-            .required(true)
-        )
-        .get_matches();
-    let pattern = args.value_of("pattern").unwrap();
-    let re = Regex::new(pattern).unwrap();
-    let input = args.value_of("input").unwrap_or("-");
-
-    if input == "-" {
-        let stdin = io::stdin();
-        let reader = stdin.lock();
-        process_lines(reader, re);
-    } else {
-        let f = File::open(input).unwrap();
-        let reader = BufReader::new(f);
-        process_lines(reader, re);
-    }
+    print!("a");
 }
 
-fn process_lines<T: BufRead + Sized>(reader: T, re: Regex) {
-    for line_ in reader.lines() {
-        let line = line_.unwrap();
-        match re.find(&line) {    // line是String类型，但是re.find()接收类型为&str的参数，
-            Some(_) => println!("{}", line),    // 代表re.find()方法查找成功。Some中的_是通配符，匹配所有值
-            None => (),    // 空的占位符的值
-        }
-    }
+#[allow(dead_code)] // 放宽一个未使用函数的编译器警告
+fn read() {}
+
+fn dead_end() -> ! {
+    panic!("you have reached a dead code"); // panic！宏会导致程序崩溃，这意味着此函数保证用不返回。
 }
 
-// 执行 cargo run Cisco -  , 然后输入 Hi Cisco
+fn forever() -> ! {
+    loop { // loop将永远不会结束循环。这阻止了此函数返回。如果包含了break，编译就会出错，因为返回了（），需要修改返回值类型
+        // ...
+        break;
+    }
+}
