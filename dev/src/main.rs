@@ -1,19 +1,15 @@
 #![allow(unused_variables)] // 在构思过程中放宽编译器警告
 
-fn main() {
-    print!("a");
+#[derive(Debug)] // 允许使用println!宏（以及其他fmt!等宏）来打印File，std::fmt::Debug这个trait与此宏中的迷你语言{:?}结合在一起，就可以将File表示为可打印的字符串了。
+struct File {
+    name: String,
+    data: Vec<u8>,
 }
 
-#[allow(dead_code)] // 放宽一个未使用函数的编译器警告
+#[allow(dead_code)] // 放宽一个未使用函数的编译器警告, 函数未使用，默认是#[warn(dead_code)]，也就是未使用给警告
 fn read() {}
 
-fn dead_end() -> ! {
-    panic!("you have reached a dead code"); // panic！宏会导致程序崩溃，这意味着此函数保证用不返回。
-}
 
-fn forever() -> ! {
-    loop { // loop将永远不会结束循环。这阻止了此函数返回。如果包含了break，编译就会出错，因为返回了（），需要修改返回值类型
-        // ...
-        break;
-    }
+fn main() {
+    print!("Hi");
 }
