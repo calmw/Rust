@@ -1,40 +1,26 @@
-#![allow(dead_code)]              // <1>
+#![allow(dead_code)]
 
 use std::fmt;
-// <2>
-use std::fmt::{Display};          // <3>
+use std::fmt::{Display};
 
 #[derive(Debug, PartialEq)]
-enum FileState {
+// 如果将整个枚举标记为公有的，则其变体也为公有的
+pub enum FileState {
     Open,
     Closed,
 }
 
 #[derive(Debug)]
-struct File {
-    name: String,
+pub struct File {
+    pub name: String,
+    // 当第三方代码使用use来导入这个包时，File.data依然保持为私有的
     data: Vec<u8>,
-    state: FileState,
-}
-
-impl Display for FileState {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            FileState::Open => write!(f, "OPEN"),      // 在这里，我们悄悄利用了write!来做复杂的工作。字符串本身已经实现了Display
-            FileState::Closed => write!(f, "CLOSED"),  // <4>
-        }
-    }
-}
-
-impl Display for File {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "<{} ({})>",
-               self.name, self.state)              // 我们可以依赖于FileState类型的Display实现
-    }
+    pub state: FileState,
 }
 
 impl File {
-    fn new(name: &str) -> File {
+    // 虽然File结构体是公有的，但其方法也必须显式的标记为共有的
+    pub fn new(name: &str) -> File {
         File {
             name: String::from(name),
             data: Vec::new(),
@@ -43,9 +29,4 @@ impl File {
     }
 }
 
-fn main() {
-    let f6 = File::new("f6.txt");
-    //...
-    println!("{:?}", f6);           // <6>
-    println!("{}", f6);             // <7>
-}
+fn main() {}
