@@ -1,21 +1,48 @@
 #[derive(Debug)]
-struct Demo {
-    a: i32,
+struct CubeSat {
+    id: u64,
+    mailbox: Mailbox,
 }
 
-fn send(to: CubeSat, msg: Message) {
-    to.mailbox.messages.push(msg)
+#[derive(Debug)]
+struct Mailbox {
+    messages: Vec<Message>,
 }
 
-fn send(to: &mut CubeSat, msg: Message) {
-    to.mailbox.messages.push(msg)
+type Message = String;
+
+struct GroundStation;
+
+impl GroundStation {
+    fn send(&self, to: &mut CubeSat, msg: Message) {
+        to.mailbox.messages.push(msg);
+    }
 }
 
-fn use_value(_val: Demo) {}
+impl CubeSat {
+    fn recv(&mut self) -> Option<Message> {
+        self.mailbox.messages.pop()
+    }
+}
 
 fn main() {
-    let a = Demo { a: 3 };
-    use_value(a);
-    println!("{:?}", a)
+    let base = GroundStation {};
+    let mut sat_a = CubeSat {
+        id: 0,
+        mailbox: Mailbox {
+            messages: vec![],
+        },
+    };
+
+    println!("t0: {:?}", sat_a);
+
+    base.send(&mut sat_a,
+              Message::from("hello there!"));    // <1>
+
+    println!("t1: {:?}", sat_a);
+
+    let msg = sat_a.recv();
+    println!("t2: {:?}", sat_a);
+
+    println!("msg: {:?}", msg);
 }
-// 编译不通过
