@@ -8,3 +8,32 @@
 | 在具体行为上可能会有差别，软件包的作者会为包中的类型定义出克隆的具体含义                           | 行为上总是相同的，总是按位复制原本的值                                              |
 
 #### 实现Copy
+
+- 1 通过derive来实现copy
+
+```rust
+#[derive(Copy, Clone, Debug)] // 告诉编译器自动为每一个trait添加一个实现
+struct CubeSat {
+    id: u64,
+    mailbox: Mailbox,
+}
+```
+
+- 2 手动实现copy
+
+``` rust
+#[derive(Debug)]
+struct CubeSat {
+    id: u64,
+    mailbox: Mailbox,
+}
+
+// 在手动实现下面的Copy之前，需要先实现Clone，因为实现Copy的前提条件的实现Clone
+impl Clone for CubeSat {
+    fn clone(&self) -> Self {
+        todo!()
+    }
+}
+
+impl Copy for CubeSat {}
+```

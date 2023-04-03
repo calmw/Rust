@@ -1,7 +1,6 @@
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 struct CubeSat {
     id: u64,
-    mailbox: Mailbox,
 }
 
 #[derive(Debug)]
@@ -29,11 +28,8 @@ fn main() {
     let base = GroundStation {};
     let mut sat_a = CubeSat {
         id: 0,
-        mailbox: Mailbox {
-            messages: vec![],
-        },
     };
-
+let a_status =
     println!("t0: {:?}", sat_a);
 
     base.send(&mut sat_a,
