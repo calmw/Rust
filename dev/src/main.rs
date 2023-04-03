@@ -1,44 +1,32 @@
-#[derive(Copy, Clone, Debug)]
-struct CubeSat {
-    id: u64,
-}
+use std::rc::Rc;
+use std::cell::RefCell;
 
 #[derive(Debug)]
-struct Mailbox {
-    messages: Vec<Message>,
-}
-
-type Message = String;
-
-struct GroundStation;
-
-impl GroundStation {
-    fn send(&self, to: &mut CubeSat, msg: Message) {
-        to.mailbox.messages.push(msg);
-    }
-}
-
-impl CubeSat {
-    fn recv(&mut self) -> Option<Message> {
-        self.mailbox.messages.pop()
-    }
+struct GroundStation {
+    radio_freq: f64,  // Mhz
 }
 
 fn main() {
-    let base = GroundStation {};
-    let mut sat_a = CubeSat {
-        id: 0,
-    };
-let a_status =
-    println!("t0: {:?}", sat_a);
+    let base: Rc<RefCell<GroundStation>> = Rc::new(RefCell::new(
+        GroundStation {
+            radio_freq: 87.65
+        }
+    ));
 
-    base.send(&mut sat_a,
-              Message::from("hello there!"));    // <1>
+    println!("base: {:?}", base);
 
-    println!("t1: {:?}", sat_a);
+    // 引入一个新的作用域，在此作用域中对base执行了可变借用
+    {                                            // <1>
+        let mut base_2 = base.borrow_mut();
+        base_2.radio_freq -= 12.34;
+        println!("base_2: {:?}", base_2);
+    }
 
-    let msg = sat_a.recv();
-    println!("t2: {:?}", sat_a);
+    println!("base: {:?}", base);
 
-    println!("msg: {:?}", msg);
+    let mut base_3 = base.borrow_mut();
+    base_3.radio_freq += 43.21;
+
+    println!("base: {:?}", base); // base: RefCell { value: <borrowed> } ，value: <borrowed>表示base被别处的代码进行了可变借用，不能再进行常规的访问。
+    println!("base_3: {:?}", base_3);
 }
