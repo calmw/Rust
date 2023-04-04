@@ -1,6 +1,11 @@
-#[allow(arithmetic_overflow)] // arithmetic 算术。告诉编译器允许算数溢出. 这样的代码可以编译通过，但运行会出现panic
+use std::mem::transmute;
+
 fn main() {
-    let (a, b) = (200, 200);
-    let c: u8 = a + b; // 如果没有这个类型声明，rust不会假设你想要创建一种不可能的情况
-    println!("200 + 200 = {}", c);
+    let big_endian: [u8; 4] = [0xAA, 0xBB, 0xCC, 0xDD];
+    let little_endian: [u8; 4] = [0xDD, 0xCC, 0xBB, 0xAA];
+
+    let a: i32 = unsafe { transmute(big_endian) };
+    let b: i32 = unsafe { transmute(little_endian) };
+
+    println!("{} vs {}", a, b);
 }
