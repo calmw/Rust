@@ -63,3 +63,7 @@ fn main() {
 }
 
 ```
+
+#### impl From<T> for U
+
+- impl From<T> for U 代码块，要求类型U实现From trait中的方法（并且方法以一个类型T的值作为唯一参数）
