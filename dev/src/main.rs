@@ -1,10 +1,72 @@
-fn main() {
-    // 分离出指数，从一个f32中分离并解析出指数
-    let n: f32 = 42.42;
-    let n_bits: u32 = n.to_bits(); // 把f32的位模式解释为一个u32，以便执行后面操作
-    let exponent_ = n_bits >> 23; // 把指数部分的8的位数据位执行右移位，覆盖尾数部分
-    let exponent_ = exponent_ & 0xff; // 使用与掩码操作过滤符号位。只有最右边的8位位数据被保留下来
-    let exponent = (exponent_ as i32) - 127; // 把保留下来的位数据解释成一个有符号整数，然后依据标准定义。还需要减去指数偏置量。
+#[derive(Debug,Clone,Copy,PartialEq,Eq)]
+pub struct Q7(i8);
 
-    println!("{} vs {}", n_bits, exponent);
+impl From<f64> for Q7 {
+    fn from (n: f64) -> Self {
+        if n >= 1.0 {
+            Q7(127)
+        } else if n <= -1.0 {
+            Q7(-128)
+        } else {
+            Q7((n * 128.0) as i8)
+        }
+    }
 }
+
+impl From<Q7> for f64 {
+    fn from(n: Q7) -> f64 {
+        (n.0 as f64) * 2f64.powf(-7.0)
+    }
+}
+
+impl From<f32> for Q7 {
+    fn from (n: f32) -> Self {
+        Q7::from(n as f64)
+    }
+}
+
+impl From<Q7> for f32 {
+    fn from(n: Q7) -> f32 {
+        f64::from(n) as f32
+    }
+}
+
+#[cfg(test)]
+mod tests {          // <1>
+use super::*;    // <2>
+
+    #[test]
+    fn out_of_bounds() {
+        assert_eq!(Q7::from(10.), Q7::from(1.));
+        assert_eq!(Q7::from(-10.), Q7::from(-1.));
+    }
+
+    #[test]
+    fn f32_to_q7() {
+        let n1: f32 = 0.7;
+        let q1 = Q7::from(n1);
+
+        let n2 = -0.4;
+        let q2 = Q7::from(n2);
+
+        let n3 = 123.0;
+        let q3 = Q7::from(n3);
+
+        assert_eq!(q1, Q7(89));
+        assert_eq!(q2, Q7(-51));
+        assert_eq!(q3, Q7(127));
+    }
+
+    #[test]
+    fn q7_to_f32() {
+        let q1 = Q7::from(0.7);
+        let n1 = f32::from(q1);
+        assert_eq!(n1, 0.6953125);
+
+        let q2 = Q7::from(n1);
+        let n2 = f32::from(q2);
+        assert_eq!(n1, n2);
+    }
+}
+
+fn main() {}
